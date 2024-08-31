@@ -28,3 +28,17 @@ func (h *UserHandler) Register(c echo.Context) error {
 
 	return c.JSON(http.StatusCreated, user)
 }
+
+func (h *UserHandler) Login(c echo.Context) error {
+	loginRequest := new(models.Login_Request)
+	if err := c.Bind(loginRequest); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request payload"})
+	}
+
+	user, err := h.userService.Login(loginRequest.Email, loginRequest.Password)
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, user)
+}

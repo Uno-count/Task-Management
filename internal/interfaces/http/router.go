@@ -22,4 +22,5 @@ func (r *Router) SetupRoutes(e *core.ServeEvent) {
 
 	api := e.Router.Group("/api")
 	api.POST("/register", userHandler.Register)
+	api.POST("/login", userHandler.Login)
 }

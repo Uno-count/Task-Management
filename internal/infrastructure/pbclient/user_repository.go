@@ -1,6 +1,8 @@
 package pbclient
 
 import (
+	"errors"
+
 	"github.com/Uno-count/Task-Management/internal/domain/models"
 	pbModels "github.com/pocketbase/pocketbase/models"
 )
@@ -47,6 +49,25 @@ func (r *UserRepository) GetByEmail(email string) (*models.User, error) {
 		Email:     record.Email(),
 		CreatedAt: record.Created.Time(),
 		UpdatedAt: record.Updated.Time(),
+	}
+
+	return user, nil
+}
+
+func (r *UserRepository) ValidateCredentials(email, password string) (*models.User, error) {
+	record, err := r.client.App.Dao().FindAuthRecordByEmail("users", email)
+	if err != nil {
+		return nil, err
+	}
+
+	if !record.ValidatePassword(password) {
+		return nil, errors.New("invalid password, please check your password")
+	}
+
+	user := &models.User{
+		ID:       record.Id,
+		Username: record.GetString("username"),
+		Email:    record.Email(),
 	}
 
 	return user, nil
